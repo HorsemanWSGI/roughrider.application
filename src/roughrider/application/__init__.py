@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type
 from dataclasses import dataclass, field
 from horseman.meta import Node
 from horseman.types import Environ, WSGICallable

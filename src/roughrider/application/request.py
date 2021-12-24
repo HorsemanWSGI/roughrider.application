@@ -3,13 +3,13 @@ import urllib.parse
 import horseman.parsers
 import horseman.types
 import horseman.http
+import horseman.meta
 import horseman.datastructures
 from dataclasses import dataclass
-from roughrider.routing.route import Route
-from roughrider.routing.components import RoutingNode, RoutingRequest
+from roughrider.routing.meta import Route
 
 
-class Request(RoutingRequest):
+class Request(horseman.meta.Overhead):
 
     __slots__ = (
         '_data',
@@ -23,7 +23,7 @@ class Request(RoutingRequest):
         'script_name',
     )
 
-    app: RoutingNode
+    app: horseman.meta.Node
     content_type: t.Optional[horseman.http.ContentType]
     cookies: horseman.http.Cookies
     environ: horseman.types.Environ
@@ -35,7 +35,7 @@ class Request(RoutingRequest):
     _data: t.Optional[horseman.datastructures.FormData]
 
     def __init__(self,
-                 app: RoutingNode,
+                 app: horseman.meta.Node,
                  environ: horseman.types.Environ,
                  route: Route):
         self._data = ...
@@ -61,11 +61,6 @@ class Request(RoutingRequest):
                 self.environ['wsgi.input'], self.content_type)
 
         return self._data
-
-    def route_path(self, name, **params):
-        if not self.app.routes.has_route(name):
-            return None
-        return self.script_name + self.app.routes.url_for(name, **params)
 
     def application_uri(self):
         scheme = self.environ['wsgi.url_scheme']

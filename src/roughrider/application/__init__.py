@@ -1,13 +1,13 @@
 from typing import Optional
 from dataclasses import dataclass, field
+from horseman.meta import Node
 from horseman.types import Environ, WSGICallable
-from roughrider.routing.route import NamedRoutes
-from roughrider.routing.components import RoutingNode
+from roughrider.routing.components import NamedRoutes
 from roughrider.application.request import Request
 
 
 @dataclass
-class Application(RoutingNode):
+class Application(Node):
     routes: NamedRoutes = field(default_factory=dict)
     utilities: dict = field(default_factory=dict)
     request_factory: Type[Request] = Request

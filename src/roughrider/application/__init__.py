@@ -8,7 +8,7 @@ from roughrider.application.request import Request
 
 @dataclass
 class Application(Node):
-    routes: NamedRoutes = field(default_factory=dict)
+    routes: NamedRoutes = field(default_factory=NamedRoutes)
     utilities: dict = field(default_factory=dict)
     request_factory: Type[Request] = Request
 

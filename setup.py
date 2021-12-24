@@ -6,7 +6,7 @@ version = "0.1"
 
 install_requires = [
     'horseman',
-    'horseman.routing'
+    'roughrider.routing'
 ]
 
 test_requires = [

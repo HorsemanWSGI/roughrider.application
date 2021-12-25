@@ -4,7 +4,6 @@ import horseman.parsers
 import horseman.types
 import horseman.http
 import horseman.meta
-import horseman.datastructures
 from dataclasses import dataclass
 from roughrider.routing.meta import Route
 
@@ -12,13 +11,13 @@ from roughrider.routing.meta import Route
 class Request(horseman.meta.Overhead):
 
     __slots__ = (
+        '_content_type',
+        '_cookies',
         '_data',
+        '_query',
         'app',
-        'content_type',
-        'cookies',
         'environ',
         'method',
-        'query',
         'route',
         'script_name',
     )
@@ -32,27 +31,23 @@ class Request(horseman.meta.Overhead):
     route: Route
     script_name: str
 
-    _data: t.Optional[horseman.datastructures.FormData]
+    _data: t.Optional[horseman.parsers.Data]
 
     def __init__(self,
                  app: horseman.meta.Node,
                  environ: horseman.types.Environ,
                  route: Route):
+        self._content_type = ...
+        self._cookies = ...
         self._data = ...
+        self._query = ...
         self.app = app
         self.environ = environ
         self.method = environ['REQUEST_METHOD'].upper()
         self.route = route
-        self.query = horseman.http.Query.from_environ(environ)
-        self.cookies = horseman.http.Cookies.from_environ(environ)
         self.script_name = urllib.parse.quote(environ['SCRIPT_NAME'])
-        if 'CONTENT_TYPE' in self.environ:
-            self.content_type = horseman.http.ContentType.from_http_header(
-                self.environ['CONTENT_TYPE'])
-        else:
-            self.content_type = None
 
-    def extract(self) -> horseman.datastructures.FormData:
+    def extract(self) -> horseman.parsers.Data:
         if self._data is not ...:
             return self._data()
 
@@ -61,6 +56,29 @@ class Request(horseman.meta.Overhead):
                 self.environ['wsgi.input'], self.content_type)
 
         return self._data
+
+    @property
+    def query(self):
+        if self._query is ...:
+            self._query = horseman.http.Query.from_environ(environ)
+        return self._query
+
+    @property
+    def cookies(self):
+        if self._cookies is ...:
+            self._cookies = horseman.http.Cookies.from_environ(environ)
+        return self._cookies
+
+    @property
+    def content_type(self):
+        if self._content_type is ...:
+            if 'CONTENT_TYPE' in self.environ:
+                self._content_type = \
+                    horseman.http.ContentType.from_http_header(
+                        self.environ['CONTENT_TYPE'])
+            else:
+                self._content_type = None
+        return self._content_type
 
     def application_uri(self):
         scheme = self.environ['wsgi.url_scheme']

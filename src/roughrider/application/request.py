@@ -1,5 +1,6 @@
 import typing as t
 import urllib.parse
+import functools
 import horseman.parsers
 import horseman.types
 import horseman.http
@@ -28,7 +29,7 @@ class Request(horseman.meta.Overhead):
     environ: horseman.types.Environ
     method: horseman.types.HTTPMethod
     query: horseman.http.Query
-    route: Route
+    route: t.Optional[Route]
     script_name: str
 
     _data: t.Optional[horseman.parsers.Data]
@@ -36,7 +37,7 @@ class Request(horseman.meta.Overhead):
     def __init__(self,
                  app: horseman.meta.Node,
                  environ: horseman.types.Environ,
-                 route: Route):
+                 route: t.Optional[Route] = None):
         self._content_type = ...
         self._cookies = ...
         self._data = ...
@@ -60,13 +61,13 @@ class Request(horseman.meta.Overhead):
     @property
     def query(self):
         if self._query is ...:
-            self._query = horseman.http.Query.from_environ(environ)
+            self._query = horseman.http.Query.from_environ(self.environ)
         return self._query
 
     @property
     def cookies(self):
         if self._cookies is ...:
-            self._cookies = horseman.http.Cookies.from_environ(environ)
+            self._cookies = horseman.http.Cookies.from_environ(self.environ)
         return self._cookies
 
     @property
@@ -80,6 +81,7 @@ class Request(horseman.meta.Overhead):
                 self._content_type = None
         return self._content_type
 
+    @functools.cached_property
     def application_uri(self):
         scheme = self.environ['wsgi.url_scheme']
         http_host = self.environ.get('HTTP_HOST')
@@ -95,7 +97,7 @@ class Request(horseman.meta.Overhead):
         return f'{scheme}://{server}:{port}{self.script_name}'
 
     def uri(self, include_query=True):
-        url = self.application_uri()
+        url = self.application_uri
         path_info = urllib.parse.quote(self.environ.get('PATH_INFO', ''))
         if include_query:
             qs = urllib.parse.quote(self.environ.get('QUERY_STRING'))

@@ -1,9 +1,10 @@
 from typing import Optional, Type
 from dataclasses import dataclass, field
 from horseman.meta import Node
-from horseman.types import Environ, WSGICallable
+from horseman.types import Environ, WSGICallable, StartResponse
 from roughrider.routing.components import NamedRoutes
 from roughrider.application.request import Request
+from roughrider.application.middleware import Middlewares
 
 
 @dataclass
@@ -17,3 +18,15 @@ class Application(Node):
         if route is not None:
             request = self.request_factory(self, environ, route)
             return route.endpoint(request, **route.params)
+
+
+@dataclass
+class WrappableApplication(Application):
+    middlewares: Middlewares = None
+
+    def __post_init__(self):
+        if self.middlewares is None:
+            self.middlewares = Middlewares(super().__call__)
+
+    def __call__(self, environ: Environ, start_response: StartResponse):
+        return self.middlewares(environ, start_response)

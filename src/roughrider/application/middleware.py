@@ -18,7 +18,7 @@ class Middlewares(WSGICallable):
         self.__call__ = self.wrapped = wrapped
         self._chain = []
 
-    def apply(self):
+    def update(self):
         if not self._chain:
             if self.__call__ and self.__call__ != self.wrapped:
                 self.__call__ = self.wrapped
@@ -35,11 +35,11 @@ class Middlewares(WSGICallable):
             self._chain = [(order, middleware)]
         else:
             bisect.insort(self._chain, (order, middleware))
-        self.apply()
+        self.update()
 
     def remove(self, middleware: WSGIMiddleware, order: int = 0):
         self._chain.remove((order, middleware))
-        self.apply()
+        self.update()
 
     def clear(self):
         self._chain.clear()

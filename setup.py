@@ -11,7 +11,6 @@ install_requires = [
 
 test_requires = [
     'WebTest',
-    'pyhamcrest',
     'pytest',
 ]
 

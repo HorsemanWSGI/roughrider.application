@@ -50,7 +50,7 @@ class Request(horseman.meta.Overhead):
 
     def extract(self) -> horseman.parsers.Data:
         if self._data is not ...:
-            return self._data()
+            return self._data
 
         if self.content_type:
             self._data = horseman.parsers.parser(

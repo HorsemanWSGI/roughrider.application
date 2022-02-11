@@ -116,8 +116,12 @@ def test_request_data():
     }
     app = Application()
     request = Request(app, environ)
-    assert request.extract() == Data(
+    data = request.extract()
+
+    assert data == Data(
         form=None,
         files=None,
         json={'username': 'test', 'password': 'test'}
     )
+
+    assert request.extract() is data

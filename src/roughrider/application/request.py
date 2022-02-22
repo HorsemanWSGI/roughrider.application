@@ -87,7 +87,7 @@ class Request(horseman.meta.Overhead):
         http_host = self.environ.get('HTTP_HOST')
         if not http_host:
             server = self.environ['SERVER_NAME']
-            port = self.environ.get['SERVER_PORT']
+            port = self.environ.get('SERVER_PORT', '80')
         elif ':' in http_host:
             server, port = http_host.split(':', 1)
         else:

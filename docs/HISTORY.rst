@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.3.1 (2022-02-22)
+----------------
+
+  * Added a handful of tests for `application_uri`.
+
+
 0.3 (2022-02-22)
 ----------------
 

@@ -95,6 +95,13 @@ def test_request_uri():
         'http://example.com/api/?action%3Dlogin%26token%3Dabcdef'
     )
 
+    del environ['HTTP_HOST']
+    environ['SERVER_NAME'] = 'example.com'
+    request = Request(app, environ)
+    assert request.uri() == (
+        'http://example.com/api/?action%3Dlogin%26token%3Dabcdef'
+    )
+
 
 def test_request_cookies():
     app = Application()

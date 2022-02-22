@@ -85,11 +85,14 @@ class Request(horseman.meta.Overhead):
     def application_uri(self):
         scheme = self.environ['wsgi.url_scheme']
         http_host = self.environ.get('HTTP_HOST')
-        if http_host:
+        if not http_host:
+            server = self.environ['SERVER_NAME']
+            port = self.environ.get['SERVER_PORT']
+        elif ':' in http_host:
             server, port = http_host.split(':', 1)
         else:
-            server = self.environ['SERVER_NAME']
-            port = self.environ['SERVER_PORT']
+            server = http_host
+            port = '80'
 
         if (scheme == 'http' and port == '80') or \
            (scheme == 'https' and port == '443'):

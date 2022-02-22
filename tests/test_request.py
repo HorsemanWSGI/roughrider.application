@@ -87,6 +87,14 @@ def test_request_uri():
     )
     assert request.uri(include_query=False) == 'http://example.com:999/api/'
 
+    # Faulty environ. Needs to handle things like repoze.vhm
+    environ['HTTP_HOST'] = 'example.com'
+    del environ['SERVER_PORT']
+    request = Request(app, environ)
+    assert request.uri() == (
+        'http://example.com/api/?action%3Dlogin%26token%3Dabcdef'
+    )
+
 
 def test_request_cookies():
     app = Application()
